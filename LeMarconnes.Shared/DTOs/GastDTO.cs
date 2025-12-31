@@ -1,49 +1,53 @@
 // ======== Imports ========
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor Gast — bevat NAW gegevens en optionele betaalgegevens.
+    [Table("GAST")]
     public class GastDTO {
         // ==== Properties ====
-        // Database kolommen
-
-        // Primary Key
+        [Key]
         public int GastID { get; set; }
 
-        // Volledige naam van de gast
+        [Required]
+        [MaxLength(100)]
         public string Naam { get; set; } = string.Empty;
 
-        // Email adres (uniek)
+        [Required]
+        [MaxLength(150)]
         public string Email { get; set; } = string.Empty;
 
-        // Telefoonnummer (optioneel)
+        [MaxLength(20)]
         public string? Tel { get; set; }
 
-        // Straatnaam
+        [Required]
+        [MaxLength(100)]
         public string Straat { get; set; } = string.Empty;
 
-        // Huisnummer inclusief toevoeging
+        [Required]
+        [MaxLength(20)]
         public string Huisnr { get; set; } = string.Empty;
 
-        // Postcode
+        [Required]
+        [MaxLength(20)]
         public string Postcode { get; set; } = string.Empty;
 
-        // Woonplaats
+        [Required]
+        [MaxLength(100)]
         public string Plaats { get; set; } = string.Empty;
 
-        // Land (default Nederland)
+        [Required]
+        [MaxLength(50)]
         public string Land { get; set; } = "Nederland";
 
-        // IBAN (optioneel)
+        [MaxLength(34)]
         public string? IBAN { get; set; }
 
-        // ==== Constructors ====
-
-        // Parameterloze constructor
+        // ==== Constructor ====
         public GastDTO() { }
 
-        // Constructor met minimale velden
         public GastDTO(int gastId, string naam, string email) {
             GastID = gastId;
             Naam = naam;

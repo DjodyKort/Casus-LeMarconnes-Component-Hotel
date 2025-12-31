@@ -1,25 +1,24 @@
 // ======== Imports ========
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor Platform — boekingskanalen met commissiepercentages.
-    // ID 1: "Eigen Site" (0%), ID 2: "Booking.com" (15%), ID 3: "Airbnb" (3%)
+    [Table("PLATFORM")]
     public class PlatformDTO {
         // ==== Properties ====
-        // Database kolommen
-
-        // Primary Key
+        [Key]
         public int PlatformID { get; set; }
 
-        // Naam van het platform
+        [Required]
+        [MaxLength(100)]
         public string Naam { get; set; } = string.Empty;
 
-        // Commissiepercentage
+        [Column(TypeName = "decimal(5,2)")]
         public decimal CommissiePercentage { get; set; }
 
-        // ==== Constructors ====
-
+        // ==== Constructor ====
         public PlatformDTO() { }
 
         public PlatformDTO(int platformId, string naam, decimal commissiePercentage) {

@@ -1,45 +1,45 @@
 // ======== Imports ========
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor Tarief — bevat prijslogica en geldigheidsperiode.
-    // TypeID 1 (Geheel): Prijs per nacht
-    // TypeID 2 (Slaapplek): Prijs per persoon per nacht
+    [Table("TARIEF")]
     public class TariefDTO {
-        // ==== Properties ====        
+        // ==== Properties ====
+        [Key]
         public int TariefID { get; set; }
 
-        // FK naar ACCOMMODATIE_TYPE (1=Geheel, 2=Slaapplek)
         public int TypeID { get; set; }
 
-        // FK naar TARIEF_CATEGORIE (bijv. 1=Overnachting, 2=Schoonmaak)
         public int CategorieID { get; set; }
 
-        // FK naar PLATFORM (null = algemeen tarief)
         public int? PlatformID { get; set; }
 
-        // Prijs (per nacht of per persoon per nacht)
+        [Column(TypeName = "decimal(19,4)")] // Standaard voor 'MONEY' in C# -> SQL mapping
         public decimal Prijs { get; set; }
 
-        // Toeristenbelasting status (false=Excl, true=Incl)
         public bool TaxStatus { get; set; }
 
-        // Toeristenbelasting tarief per persoon per nacht
+        [Column(TypeName = "decimal(19,4)")]
         public decimal TaxTarief { get; set; }
 
-        // Geldigheid vanaf
         public DateTime GeldigVan { get; set; }
 
-        // Geldigheid tot (null = onbeperkt)
         public DateTime? GeldigTot { get; set; }
 
         // ==== OOB (Relational) Properties ====
-        public AccommodatieTypeDTO? Type { get; set; }
-        public TariefCategorieDTO? Categorie { get; set; }
-        public PlatformDTO? Platform { get; set; }
+        [ForeignKey("TypeID")]
+        public virtual AccommodatieTypeDTO? Type { get; set; }
 
-        // ==== Constructors ====
+        [ForeignKey("CategorieID")]
+        public virtual TariefCategorieDTO? Categorie { get; set; }
+
+        [ForeignKey("PlatformID")]
+        public virtual PlatformDTO? Platform { get; set; }
+
+        // ==== Constructor ====
         public TariefDTO() { }
 
         public TariefDTO(int tariefId, int typeId, int categorieId, decimal prijs, DateTime geldigVan) {

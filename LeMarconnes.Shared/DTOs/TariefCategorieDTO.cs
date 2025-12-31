@@ -1,12 +1,18 @@
 // ======== Imports ========
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor TariefCategorie — lookup: 'Logies', 'Toeristenbelasting', etc.
+    [Table("TARIEF_CATEGORIE")]
     public class TariefCategorieDTO {
         // ==== Properties ====
+        [Key]
         public int CategorieID { get; set; }
+
+        [Required]
+        [MaxLength(100)]
         public string Naam { get; set; } = string.Empty;
 
         // ==== Constructor ====

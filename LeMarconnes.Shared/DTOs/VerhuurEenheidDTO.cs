@@ -1,36 +1,45 @@
 // ======== Imports ========
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor VerhuurEenheid. Parent-child structuur via ParentEenheidID.
+    [Table("VERHUUR_EENHEID")]
     public class VerhuurEenheidDTO {
-        // ==== Properties ====       
+        // ==== Properties ====
+        [Key]
         public int EenheidID { get; set; }
 
+        [Required]
+        [MaxLength(100)]
         public string Naam { get; set; } = string.Empty;
 
-        // FK naar ACCOMMODATIE_TYPE (1=Geheel, 2=Slaapplek)
         public int TypeID { get; set; }
 
         public int MaxCapaciteit { get; set; }
 
-        // (null voor parent zelf)
         public int? ParentEenheidID { get; set; }
 
         // ==== OOB (Relational) Properties ====
-        public AccommodatieTypeDTO? Type { get; set; }
+        [ForeignKey("TypeID")]
+        public virtual AccommodatieTypeDTO? Type { get; set; }
 
         [JsonIgnore]
-        public VerhuurEenheidDTO? ParentEenheid { get; set; }
-        public List<VerhuurEenheidDTO> ChildEenheden { get; set; } = new();
+        [ForeignKey("ParentEenheidID")]
+        public virtual VerhuurEenheidDTO? ParentEenheid { get; set; }
+
+        // Deze lijst bevat alle 'kinderen' die naar DEZE eenheid wijzen als parent
+        [InverseProperty("ParentEenheid")]
+        public virtual List<VerhuurEenheidDTO> ChildEenheden { get; set; } = new();
 
         // ==== Runtime Properties ====
-        // Niet opgeslagen in DB; berekend door business logic
+        [NotMapped] // Dit betekent: EF Core, negeer dit veld voor de database!
         public bool IsBeschikbaar { get; set; } = true;
 
-        // ==== Constructors ====
+        // ==== Constructor ====
         public VerhuurEenheidDTO() { }
 
         public VerhuurEenheidDTO(int eenheidId, string naam, int typeId, int maxCapaciteit, int? parentEenheidId) {

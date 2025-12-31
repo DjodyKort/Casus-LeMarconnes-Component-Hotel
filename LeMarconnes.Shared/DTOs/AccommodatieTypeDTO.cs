@@ -1,12 +1,18 @@
 // ======== Imports ========
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor AccommodatieType — lookup: 'Gîte-Geheel' (1), 'Gîte-Slaapplek' (2).
+    [Table("ACCOMMODATIE_TYPE")]
     public class AccommodatieTypeDTO {
         // ==== Properties ====
+        [Key]
         public int TypeID { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Naam { get; set; } = string.Empty;
 
         // ==== Constructor ====

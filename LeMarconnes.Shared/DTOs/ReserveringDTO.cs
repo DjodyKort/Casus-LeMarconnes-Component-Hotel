@@ -1,31 +1,44 @@
 // ======== Imports ========
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // DTO voor Reservering: koppelt Gast, Eenheid en Periode.
+    [Table("RESERVERING")]
     public class ReserveringDTO {
         // ==== Properties ====
+        [Key]
         public int ReserveringID { get; set; }
 
-        // FK naar Gast
         public int GastID { get; set; }
 
-        // FK naar Eenheid
         public int EenheidID { get; set; }
 
-        // FK naar Platform
         public int PlatformID { get; set; }
+
         public DateTime Startdatum { get; set; }
+
         public DateTime Einddatum { get; set; }
 
-        // Status (Gereserveerd/Ingecheckt/Uitgecheckt/Geannuleerd)
+        [Required]
+        [MaxLength(20)]
         public string Status { get; set; } = "Gereserveerd";
 
         // ==== OOB (Relational) Properties ====
-        public GastDTO? Gast { get; set; }
-        public VerhuurEenheidDTO? Eenheid { get; set; }
-        public PlatformDTO? Platform { get; set; }
+        [ForeignKey("GastID")]
+        public virtual GastDTO? Gast { get; set; }
+
+        [ForeignKey("EenheidID")]
+        public virtual VerhuurEenheidDTO? Eenheid { get; set; }
+
+        [ForeignKey("PlatformID")]
+        public virtual PlatformDTO? Platform { get; set; }
+
+        // Hiermee kun je straks doen: reservering.Details.Sum(d => d.Prijs)
+        [InverseProperty("Reservering")]
+        public virtual List<ReserveringDetailDTO> Details { get; set; } = new();
 
         // ==== Constructors ====
         public ReserveringDTO() { }
