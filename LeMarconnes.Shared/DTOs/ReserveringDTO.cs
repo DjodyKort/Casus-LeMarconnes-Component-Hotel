@@ -1,55 +1,31 @@
 // ======== Imports ========
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    [Table("RESERVERING")]
+    // DTO voor Reservering: koppelt Gast, Eenheid en Periode.
     public class ReserveringDTO {
         // ==== Properties ====
-        [Key]
-        [Column("ReserveringID")]
         public int ReserveringID { get; set; }
 
-        [Required]
-        [Column("GastID")]
+        // FK naar Gast
         public int GastID { get; set; }
 
-        [Required]
-        [Column("EenheidID")]
+        // FK naar Eenheid
         public int EenheidID { get; set; }
 
-        [Required]
-        [Column("PlatformID")]
+        // FK naar Platform
         public int PlatformID { get; set; }
-
-        [Required]
-        [Column("Startdatum")]
         public DateTime Startdatum { get; set; }
-
-        [Required]
-        [Column("Einddatum")]
         public DateTime Einddatum { get; set; }
 
-        [StringLength(20)]
-        [Column("Status")]
+        // Status (Gereserveerd/Ingecheckt/Uitgecheckt/Geannuleerd)
         public string Status { get; set; } = "Gereserveerd";
 
-        // ==== OO Navigatie Properties ====
-        [ForeignKey(nameof(GastID))]
+        // ==== OOB (Relational) Properties ====
         public GastDTO? Gast { get; set; }
-
-        [ForeignKey(nameof(EenheidID))]
         public VerhuurEenheidDTO? Eenheid { get; set; }
-
-        [ForeignKey(nameof(PlatformID))]
         public PlatformDTO? Platform { get; set; }
-
-        // Master-Detail relatie
-        [InverseProperty(nameof(ReserveringDetailDTO.Reservering))]
-        public List<ReserveringDetailDTO> Details { get; set; } = new();
 
         // ==== Constructors ====
         public ReserveringDTO() { }

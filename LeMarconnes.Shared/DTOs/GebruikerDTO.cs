@@ -3,11 +3,9 @@ using System;
 using System.Text.Json.Serialization;
 
 // ======== Namespace ========
-namespace LeMarconnes.Shared.DTOs
-{
+namespace LeMarconnes.Shared.DTOs {
     // DTO voor Gebruiker. WachtwoordHash wordt NOOIT naar client gestuurd.
-    public class GebruikerDTO
-    {
+    public class GebruikerDTO {
         // ==== Properties ====
         public int GebruikerID { get; set; }
         public int? GastID { get; set; }
@@ -22,8 +20,7 @@ namespace LeMarconnes.Shared.DTOs
         // ==== Constructor ====
         public GebruikerDTO() { }
 
-        public GebruikerDTO(int gebruikerId, string email, string rol)
-        {
+        public GebruikerDTO(int gebruikerId, string email, string rol) {
             GebruikerID = gebruikerId;
             Email = email;
             Rol = rol;

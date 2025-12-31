@@ -1,49 +1,33 @@
 // ======== Imports ========
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 // ======== Namespace ========
 namespace LeMarconnes.Shared.DTOs {
-    // Mapt naar tabel VERHUUR_EENHEID
-    [Table("VERHUUR_EENHEID")]
+    // DTO voor VerhuurEenheid. Parent-child structuur via ParentEenheidID.
     public class VerhuurEenheidDTO {
-        // ==== Properties ====
-        [Key]
-        [Column("EenheidID")]
+        // ==== Properties ====       
         public int EenheidID { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        [Column("Naam")]
         public string Naam { get; set; } = string.Empty;
 
-        [Required]
-        [Column("TypeID")]
+        // FK naar ACCOMMODATIE_TYPE (1=Geheel, 2=Slaapplek)
         public int TypeID { get; set; }
 
-        [Required]
-        [Column("MaxCapaciteit")]
         public int MaxCapaciteit { get; set; }
 
-        [Column("ParentEenheidID")]
+        // (null voor parent zelf)
         public int? ParentEenheidID { get; set; }
 
-        // ==== OO Navigatie Properties ====
-        [ForeignKey(nameof(TypeID))]
+        // ==== OOB (Relational) Properties ====
         public AccommodatieTypeDTO? Type { get; set; }
 
         [JsonIgnore]
-        [ForeignKey(nameof(ParentEenheidID))]
         public VerhuurEenheidDTO? ParentEenheid { get; set; }
-
-        [InverseProperty(nameof(ParentEenheid))]
         public List<VerhuurEenheidDTO> ChildEenheden { get; set; } = new();
 
         // ==== Runtime Properties ====
-        [NotMapped] // Dit veld bestaat niet in de database
+        // Niet opgeslagen in DB; berekend door business logic
         public bool IsBeschikbaar { get; set; } = true;
 
         // ==== Constructors ====

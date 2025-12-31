@@ -2,11 +2,9 @@
 using System;
 
 // ======== Namespace ========
-namespace LeMarconnes.Shared.DTOs
-{
+namespace LeMarconnes.Shared.DTOs {
     // Request DTO voor beschikbaarheidscheck binnen een periode.
-    public class BeschikbaarheidRequestDTO
-    {
+    public class BeschikbaarheidRequestDTO {
         // ==== Properties ====
         public DateTime StartDatum { get; set; }
         public DateTime EindDatum { get; set; }
@@ -14,8 +12,7 @@ namespace LeMarconnes.Shared.DTOs
         // ==== Constructor ====
         public BeschikbaarheidRequestDTO() { }
 
-        public BeschikbaarheidRequestDTO(DateTime startDatum, DateTime eindDatum)
-        {
+        public BeschikbaarheidRequestDTO(DateTime startDatum, DateTime eindDatum) {
             StartDatum = startDatum;
             EindDatum = eindDatum;
         }
