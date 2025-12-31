@@ -6,9 +6,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeMarconnes.Client", "LeMar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeMarconnes.Shared", "LeMarconnes.Shared\LeMarconnes.Shared.csproj", "{CEC52457-CF83-E5C1-DF6A-D639FC0D59C4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApplication1", "WebApplication1", "{CAA89F83-C6F7-8CD6-55EA-6F750AA7E00E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LeMarconnes.API", "LeMarconnes.API", "{CAA89F83-C6F7-8CD6-55EA-6F750AA7E00E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeMarconnes.API", "WebApplication1\LeMarconnes.API.csproj", "{2A36538E-8324-FDD7-9DB8-EEBBD6F4AE9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeMarconnes.API", "LeMarconnes.API\LeMarconnes.API.csproj", "{2A36538E-8324-FDD7-9DB8-EEBBD6F4AE9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

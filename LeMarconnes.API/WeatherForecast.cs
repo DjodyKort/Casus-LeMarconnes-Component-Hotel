@@ -1,4 +1,4 @@
-namespace WebApplication1
+namespace LeMarconnes.API
 {
     public class WeatherForecast
     {
