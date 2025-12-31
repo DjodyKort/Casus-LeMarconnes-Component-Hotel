@@ -1,4 +1,6 @@
 // ======== Imports ========
+using Microsoft.EntityFrameworkCore;
+using LeMarconnes.API.DAL;
 using LeMarconnes.API.DAL.Interfaces;
 using LeMarconnes.API.DAL.Repositories;
 
@@ -11,16 +13,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ==== Add services to the container ====
 
-// Controllers - activeert de MVC/API controller functionaliteit
+// Controllers
 builder.Services.AddControllers();
 
-// OpenAPI / Swagger - voor API documentatie en testing
+// OpenAPI / Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DAL - Repository (Dependency Injection)
-// AddScoped = nieuwe instantie per HTTP request
-builder.Services.AddScoped<IGiteRepository, GiteRepository>();
+// ==== Database Configuration (EF Core) ====
+// We halen de connection string op en koppelen de Context aan MySQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<LeMarconnesContext>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+    ));
+
+// ==== Repository Injection ====
+// Koppel de Interface aan de Implementatie
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 
 // ============================================================
 // APP CONFIGURATION
@@ -29,6 +41,25 @@ builder.Services.AddScoped<IGiteRepository, GiteRepository>();
 
 var app = builder.Build();
 
+// ==== Database Seeding (Code First) ====
+// Dit blok voert migraties uit en vult de database met startdata (Hotelkamers)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<LeMarconnesContext>();
+        // Roep de Seeder aan die we eerder hebben gemaakt
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Er is een fout opgetreden bij het seeden van de database.");
+    }
+}
+
+// ==== Middleware ====
 if (app.Environment.IsDevelopment()) 
 {
     app.UseSwagger();
@@ -41,7 +72,6 @@ app.MapControllers();
 
 // ============================================================
 // START APPLICATION
-// Start de webserver
 // ============================================================
 
 app.Run();
