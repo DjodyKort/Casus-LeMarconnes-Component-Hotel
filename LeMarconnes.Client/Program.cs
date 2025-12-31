@@ -18,7 +18,7 @@ class Program
     // ==== Properties ====
     private static readonly HttpClient _httpClient = new HttpClient();
     
-    // BELANGRIJK: Base URL wijst nu naar de HOTEL controller
+    // BELANGRIJK: Base URL wijst naar de HOTEL controller op poort 7221 (HTTPS)
     private static readonly string _baseUrl = "https://localhost:7221/api/hotel";
     
     private static readonly JsonSerializerOptions _jsonOptions = new()
@@ -37,7 +37,7 @@ class Program
         Console.OutputEncoding = Encoding.UTF8;
         PrintHeader();
 
-        // Check of de API bereikbaar is bij opstarten (optioneel, voor UX)
+        // Check verbinding bij start (UX)
         Console.WriteLine($"Verbinden met API op {_baseUrl}...");
 
         while (true)
@@ -70,7 +70,7 @@ class Program
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"\nVerbindingsfout: Kan geen verbinding maken met de API.");
-                Console.WriteLine($"   Check of de API draait.");
+                Console.WriteLine($"   Check of de API draait (dotnet run in WebApplication1).");
                 Console.WriteLine($"   Details: {ex.Message}");
                 Console.ResetColor();
             }
@@ -89,19 +89,43 @@ class Program
     }
 
     // ============================================================
-    // ==== INPUT HELPER METHODS ====
+    // ==== INPUT HELPER METHODS (VERBETERD) ====
     // ============================================================
 
-    private static DateTime VraagDatum(string prompt)
+    /// <summary>
+    /// Vraagt datum met formaat-hint en optionele default waarde bij Enter.
+    /// </summary>
+    private static DateTime VraagDatum(string prompt, DateTime? defaultDatum = null)
     {
         while (true)
         {
-            Console.Write(prompt);
-            var input = Console.ReadLine();
-            if (DateTime.TryParse(input, out var datum)) return datum;
+            // Bouw de prompt string (bijv: "Startdatum [2025-07-01]: ")
+            string defaultStr = defaultDatum.HasValue ? $" [{defaultDatum.Value:yyyy-MM-dd}]" : " (yyyy-MM-dd)";
+            Console.Write($"{prompt}{defaultStr}: ");
+            
+            var input = Console.ReadLine()?.Trim();
+
+            // Als leeg en er is een default -> gebruik default
+            if (string.IsNullOrWhiteSpace(input) && defaultDatum.HasValue)
+            {
+                return defaultDatum.Value;
+            }
+
+            // Probeer te parsen
+            if (DateTime.TryParse(input, out var datum)) 
+            {
+                // Extra check: Hotel Seizoen (maart-okt) - Waarschuwing geven
+                if (datum.Month < 3 || datum.Month > 10)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("   Let op: Deze datum valt buiten het hotelseizoen (1 mrt - 31 okt).");
+                    Console.ResetColor();
+                }
+                return datum;
+            }
             
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("   Ongeldige datum. (yyyy-MM-dd)");
+            Console.WriteLine("   Ongeldige datum. Gebruik formaat: jjjj-mm-dd (bijv. 2025-07-20)");
             Console.ResetColor();
         }
     }
@@ -113,11 +137,11 @@ class Program
             Console.Write(prompt);
             if (int.TryParse(Console.ReadLine(), out var waarde))
             {
-                if (min.HasValue && waarde < min.Value) { Console.WriteLine($"Minimaal {min}"); continue; }
-                if (max.HasValue && waarde > max.Value) { Console.WriteLine($"Maximaal {max}"); continue; }
+                if (min.HasValue && waarde < min.Value) { Console.WriteLine($"   Waarde moet minimaal {min} zijn."); continue; }
+                if (max.HasValue && waarde > max.Value) { Console.WriteLine($"   Waarde mag maximaal {max} zijn."); continue; }
                 return waarde;
             }
-            Console.WriteLine("   Ongeldig getal.");
+            Console.WriteLine("   Ongeldig getal. Probeer opnieuw.");
         }
     }
 
@@ -125,17 +149,24 @@ class Program
     {
         while (true)
         {
-            Console.Write(prompt);
-            var input = Console.ReadLine();
+            string defaultStr = !string.IsNullOrEmpty(defaultWaarde) ? $" [{defaultWaarde}]" : "";
+            Console.Write($"{prompt}{defaultStr}: ");
+            
+            var input = Console.ReadLine()?.Trim();
+            
             if (!string.IsNullOrWhiteSpace(input)) return input;
-            if (!verplicht) return defaultWaarde ?? "";
-            Console.WriteLine("   Verplicht veld.");
+            if (!string.IsNullOrWhiteSpace(defaultWaarde)) return defaultWaarde;
+            if (!verplicht) return "";
+            
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("   Dit veld is verplicht.");
+            Console.ResetColor();
         }
     }
 
     private static string? VraagOptional(string prompt)
     {
-        Console.Write(prompt);
+        Console.Write($"{prompt} (optioneel): ");
         var input = Console.ReadLine();
         return string.IsNullOrWhiteSpace(input) ? null : input;
     }
@@ -157,7 +188,9 @@ class Program
         {
             Console.Write(prompt);
             if (int.TryParse(Console.ReadLine(), out var id) && geldigeIds.Contains(id)) return id;
-            Console.WriteLine($"   Ongeldige keuze. Kies uit: {string.Join(", ", geldigeIds.OrderBy(x => x))}");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"   Ongeldige keuze. Kies uit ID: {string.Join(", ", geldigeIds.OrderBy(x => x))}");
+            Console.ResetColor();
         }
     }
 
@@ -167,10 +200,10 @@ class Program
 
     private static void PrintHeader()
     {
-        Console.ForegroundColor = ConsoleColor.Magenta; // Andere kleur voor Hotel
+        Console.ForegroundColor = ConsoleColor.Magenta; // Hotel Stijl
         Console.WriteLine("================================================================");
         Console.WriteLine("           LE MARCONNES - HOTEL BEHEERSYSTEEM                  ");
-        Console.WriteLine("                  (Powered by EF Core)                         ");
+        Console.WriteLine("             (EF Core | Thin Client)                           ");
         Console.WriteLine("================================================================");
         Console.ResetColor();
     }
@@ -221,8 +254,7 @@ class Program
         
         foreach (var unit in units)
         {
-            // TypeID 3 = Hotelkamer
-            var typeStr = unit.TypeID == 3 ? "Hotel" : (unit.TypeID == 1 ? "Geh" : "Bed");
+            var typeStr = unit.TypeID == 3 ? "Hotel" : "Anders";
             Console.WriteLine($"{unit.EenheidID,-5} {unit.Naam,-35} {typeStr,-10} {unit.MaxCapaciteit,-5}");
         }
     }
@@ -231,12 +263,11 @@ class Program
     {
         PrintSectionHeader("BESCHIKBAARHEID CHECKEN");
         
-        var startDatum = VraagDatum("\nStartdatum: ");
-        var eindDatum = VraagDatum("Einddatum:  ");
-
-        // Seizoen Validatie (Client-side pre-check, API doet definitieve check)
-        if (startDatum.Month < 3 || startDatum.Month > 10)
-            Console.WriteLine("Let op: U zoekt buiten het seizoen (1 mrt - 31 okt).");
+        // Default: Morgen t/m overmorgen
+        var morgen = DateTime.Today.AddDays(1);
+        
+        var startDatum = VraagDatum("Startdatum", morgen);
+        var eindDatum = VraagDatum("Einddatum ", startDatum.AddDays(1));
 
         var url = $"{_baseUrl}/beschikbaarheid?startDatum={startDatum:yyyy-MM-dd}&eindDatum={eindDatum:yyyy-MM-dd}";
         var response = await _httpClient.GetAsync(url);
@@ -268,10 +299,14 @@ class Program
     {
         PrintSectionHeader("KAMER BOEKEN");
         
-        // 1. Data verzamelen
+        // 1. Data verzamelen (Met slimme defaults)
         Console.WriteLine("\n-- Periode --");
-        var startDatum = VraagDatum("Startdatum: ");
-        var eindDatum = VraagDatum("Einddatum:  ");
+        // We stellen standaard een weekend in juli voor als voorbeeld
+        var defaultStart = new DateTime(DateTime.Today.Year, 7, 1);
+        if (defaultStart < DateTime.Today) defaultStart = defaultStart.AddYears(1); // Volgend jaar als juli al voorbij is
+
+        var startDatum = VraagDatum("Startdatum", defaultStart);
+        var eindDatum = VraagDatum("Einddatum ", startDatum.AddDays(7)); // Default 1 week
 
         // 2. Beschikbare kamers ophalen
         var url = $"{_baseUrl}/beschikbaarheid?startDatum={startDatum:yyyy-MM-dd}&eindDatum={eindDatum:yyyy-MM-dd}";
@@ -281,9 +316,14 @@ class Program
         var units = await response.Content.ReadFromJsonAsync<List<VerhuurEenheidDTO>>(_jsonOptions);
         var beschikbare = units!.Where(u => u.IsBeschikbaar).ToList();
 
-        if (beschikbare.Count == 0) { Console.WriteLine("Geen kamers beschikbaar."); return; }
+        if (beschikbare.Count == 0) { 
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Geen kamers beschikbaar in deze periode."); 
+            Console.ResetColor();
+            return; 
+        }
 
-        Console.WriteLine("\nBeschikbaar:");
+        Console.WriteLine("\nBeschikbare Kamers:");
         foreach (var u in beschikbare) Console.WriteLine($"  [{u.EenheidID}] {u.Naam} (max {u.MaxCapaciteit}p)");
 
         // 3. Keuzes maken
@@ -296,7 +336,7 @@ class Program
         var platformId = VraagKeuzeUitLijst("Kies Platform ID: ", platforms.Select(p => p.PlatformID).ToHashSet());
 
         // Gast
-        Console.WriteLine("\n-- Gast --");
+        Console.WriteLine("\n-- Gast Informatie --");
         var boeking = new BoekingRequestDTO
         {
             StartDatum = startDatum, EindDatum = eindDatum, EenheidID = eenheidId, PlatformID = platformId,
@@ -311,7 +351,8 @@ class Program
         };
 
         // 4. Versturen
-        if (!VraagBevestiging("Boeking versturen?")) return;
+        Console.WriteLine($"\nSamenvatting: {gekozenEenheid.Naam}, {boeking.AantalPersonen} pers, {(eindDatum-startDatum).Days} nachten.");
+        if (!VraagBevestiging("Boeking definitief maken?")) return;
 
         var postResponse = await _httpClient.PostAsJsonAsync($"{_baseUrl}/boek", boeking);
         var result = await postResponse.Content.ReadFromJsonAsync<BoekingResponseDTO>(_jsonOptions);
@@ -319,13 +360,13 @@ class Program
         if (result?.Succes == true)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"\nBOEKING GESLAAGD! ID: {result.ReserveringID}");
-            Console.WriteLine($"Totaalprijs (Excl tax opgeslagen, incl berekend): € {result.TotaalPrijs:N2}");
+            Console.WriteLine($"\n✅ BOEKING GESLAAGD! ID: {result.ReserveringID}");
+            Console.WriteLine($"   Totaalprijs: € {result.TotaalPrijs:N2} (Incl. Toeristenbelasting)");
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"\nMISLUKT: {result?.FoutMelding}");
+            Console.WriteLine($"\n❌ MISLUKT: {result?.FoutMelding}");
         }
         Console.ResetColor();
     }
@@ -343,11 +384,15 @@ class Program
         foreach (var r in res)
         {
             var periode = $"{r.Startdatum:dd/MM} - {r.Einddatum:dd/MM}";
-            // Gebruik Gast/Eenheid objecten als ze via EF Core Include zijn meegekomen, anders ID fallback
             var gastNaam = r.Gast?.Naam ?? r.GastID.ToString();
             var kamerNaam = r.Eenheid?.Naam ?? r.EenheidID.ToString();
 
+            // Kleur op status
+            if (r.Status == "Geannuleerd") Console.ForegroundColor = ConsoleColor.DarkGray;
+            else if (r.Status == "Ingecheckt") Console.ForegroundColor = ConsoleColor.Green;
+            
             Console.WriteLine($"{r.ReserveringID,-5} {gastNaam,-20} {kamerNaam,-20} {periode,-25} {r.Status}");
+            Console.ResetColor();
         }
     }
 
@@ -360,7 +405,7 @@ class Program
 
     private static async Task BekijkTarievenAsync()
     {
-        PrintSectionHeader("HOTEL TARIEVEN");
+        PrintSectionHeader("HOTEL TARIEVEN (2025)");
         var tarieven = await (await _httpClient.GetAsync($"{_baseUrl}/tarieven")).Content.ReadFromJsonAsync<List<TariefDTO>>(_jsonOptions);
         
         Console.WriteLine($"\n{"ID",-5} {"Cat",-10} {"Platform",-15} {"Prijs",-10} {"TaxStatus",-10}");
@@ -369,7 +414,7 @@ class Program
         foreach (var t in tarieven!)
         {
             var cat = t.CategorieID == 1 ? "Logies" : "Tax";
-            var plat = t.Platform?.Naam ?? "Alle";
+            var plat = t.Platform?.Naam ?? "Standaard";
             Console.WriteLine($"{t.TariefID,-5} {cat,-10} {plat,-15} €{t.Prijs,-9:N2} {(t.TaxStatus?"Incl":"Excl")}");
         }
     }
@@ -388,7 +433,7 @@ class Program
         if (!VraagBevestiging("Zeker weten?")) return;
 
         var response = await _httpClient.PutAsync($"{_baseUrl}/reserveringen/{id}/annuleer", null);
-        Console.WriteLine(response.IsSuccessStatusCode ? "Geannuleerd." : "Mislukt.");
+        Console.WriteLine(response.IsSuccessStatusCode ? "Geannuleerd." : "Mislukt (Bestond hij wel?).");
     }
 
     private static async Task BekijkLogsAsync()
