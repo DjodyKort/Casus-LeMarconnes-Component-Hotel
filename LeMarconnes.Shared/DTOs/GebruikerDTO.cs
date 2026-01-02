@@ -32,7 +32,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public GebruikerDTO() { }
-
         public GebruikerDTO(int gebruikerId, string email, string rol) {
             GebruikerID = gebruikerId;
             Email = email;

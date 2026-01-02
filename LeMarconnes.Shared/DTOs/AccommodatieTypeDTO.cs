@@ -17,7 +17,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public AccommodatieTypeDTO() { }
-
         public AccommodatieTypeDTO(int typeId, string naam) {
             TypeID = typeId;
             Naam = naam;

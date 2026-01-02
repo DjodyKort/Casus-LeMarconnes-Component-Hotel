@@ -11,7 +11,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public BeschikbaarheidRequestDTO() { }
-
         public BeschikbaarheidRequestDTO(DateTime startDatum, DateTime eindDatum) {
             StartDatum = startDatum;
             EindDatum = eindDatum;

@@ -36,7 +36,6 @@ namespace LeMarconnes.Shared.DTOs {
         public LogboekDTO() {
             Tijdstip = DateTime.Now;
         }
-
         public LogboekDTO(string actie, string? tabelNaam = null, int? recordId = null) {
             Actie = actie;
             TabelNaam = tabelNaam;

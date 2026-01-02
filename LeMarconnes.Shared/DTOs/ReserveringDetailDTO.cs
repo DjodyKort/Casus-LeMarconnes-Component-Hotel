@@ -31,7 +31,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public ReserveringDetailDTO() { }
-
         public ReserveringDetailDTO(int reserveringId, int categorieId, int aantal, decimal prijsOpMoment) {
             ReserveringID = reserveringId;
             CategorieID = categorieId;

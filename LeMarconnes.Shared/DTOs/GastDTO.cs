@@ -47,7 +47,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public GastDTO() { }
-
         public GastDTO(int gastId, string naam, string email) {
             GastID = gastId;
             Naam = naam;

@@ -41,7 +41,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public VerhuurEenheidDTO() { }
-
         public VerhuurEenheidDTO(int eenheidId, string naam, int typeId, int maxCapaciteit, int? parentEenheidId) {
             EenheidID = eenheidId;
             Naam = naam;

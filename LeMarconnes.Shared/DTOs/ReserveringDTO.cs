@@ -42,7 +42,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructors ====
         public ReserveringDTO() { }
-
         public ReserveringDTO(int gastId, int eenheidId, int platformId, DateTime startdatum, DateTime einddatum) {
             GastID = gastId;
             EenheidID = eenheidId;

@@ -41,7 +41,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public TariefDTO() { }
-
         public TariefDTO(int tariefId, int typeId, int categorieId, decimal prijs, DateTime geldigVan) {
             TariefID = tariefId;
             TypeID = typeId;

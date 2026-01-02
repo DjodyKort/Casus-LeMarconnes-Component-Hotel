@@ -20,7 +20,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public PlatformDTO() { }
-
         public PlatformDTO(int platformId, string naam, decimal commissiePercentage) {
             PlatformID = platformId;
             Naam = naam;

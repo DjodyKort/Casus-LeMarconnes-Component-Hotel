@@ -32,7 +32,6 @@ namespace LeMarconnes.Shared.DTOs {
         public string? FoutMelding { get; set; }
 
         // ==== Constructor ====
-
         public BoekingResponseDTO() { }
 
         // ==== Factory Methods ====

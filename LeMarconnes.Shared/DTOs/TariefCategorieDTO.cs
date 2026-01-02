@@ -17,7 +17,6 @@ namespace LeMarconnes.Shared.DTOs {
 
         // ==== Constructor ====
         public TariefCategorieDTO() { }
-
         public TariefCategorieDTO(int categorieId, string naam) {
             CategorieID = categorieId;
             Naam = naam;
